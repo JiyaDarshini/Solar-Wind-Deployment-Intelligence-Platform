@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgis/postgis:15-3.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: swdi_user
+      POSTGRES_PASSWORD: swdi_password
+      POSTGRES_DB: swdi_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - swdi_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U swdi_user -d swdi_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgresql://swdi_user:swdi_password@db:5432/swdi_db
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  swdi_pgdata:

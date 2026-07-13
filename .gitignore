@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+*.egg-info/
+
+# Environment / secrets — NEVER commit real .env
+backend/.env
+.env
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Docker
+*.log
